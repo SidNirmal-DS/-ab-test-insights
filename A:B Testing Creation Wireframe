@@ -1,9 +1,9 @@
 Building the A/B Insights Website
-This wireframe outlines the key stages and technologies that built the "A/B Insights.ai" website, emphasizing a calm, modern, and user-centric experience.
+This wireframe outlines the key stages and technologies that built the "A/B Insights.ai" website, emphasizing a user-centric experience.
 
 Phase 1: The Blueprint - Laying the Foundation
 
-We began with a clear vision: a comprehensive, visually appealing A/B testing resource with integrated modern design and intelligent tools.
+We began with a clear vision: a comprehensive, visually appealing A/B testing resource with system design and AI integration.
 
 +---------------------+    +---------------------+    +---------------------+
 |                     |    |                     |    |                     |
@@ -19,9 +19,10 @@ We began with a clear vision: a comprehensive, visually appealing A/B testing re
   - Clean, modern UI                  AI-PM, Stats)          - Placeholders for visuals
   - Interactive features            - Navigation & Footers
   - AI integration                  - Semantic HTML
+
 Phase 2: The Aesthetic - Bringing Design to Life
 
-Next, we focused on creating a calm, professional, and visually appealing site, inspired by leading tech companies.
+Next, we focused on creating visually appealing site.
 
 +---------------------+    +---------------------+    +---------------------+
 |                     |    |                     |    |                     |
@@ -78,4 +79,4 @@ The final stage involved meticulous testing and fine-tuning for a delightful use
   - Cross-browser testing             rendering
   - Fast AI API responses
 
-This flow shows how each component was considered and integrated to deliver a comprehensive, intelligent, and user-friendly A/B testing resource.
+This flow shows how each component was considered and integrated to deliver a comprehensive A/B testing resource.
