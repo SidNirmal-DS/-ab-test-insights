@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/B Testing - Your Data-Driven Product Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Mode Colors */
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --border-color: #e0e0e0;
+            --card-shadow-color: rgba(0, 0, 0, 0.1);
+            --card-shadow-color-sm: rgba(0, 0, 0, 0.06);
+            --hero-bg-start: #e3f2fd;
+            --hero-bg-end: #bbdefb;
+            --button-primary-bg: #1a73e8;
+            --button-primary-hover-bg: #1764cb;
+            --link-hover: #1a73e8;
+            --chart-label-color: #202124;
+            --chart-grid-color: #dcdcdc;
+            --venn-bg: rgba(255, 255, 255, 0.7);
+            --venn-shadow-color: rgba(0, 0, 0, 0.05);
+            --input-border: #d1d5db; /* gray-300 */
+            --input-focus-ring: #1a73e8; /* Google blue */
+            --generated-output-bg: #f1f5f9; /* slate-50 */
+            --generated-output-border: #e2e8f0; /* slate-200 */
+        }
+
+        html[data-theme='dark'] {
+            /* Dark Mode Colors */
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2c2c2c;
+            --border-color: #444444;
+            --card-shadow-color: rgba(0, 0, 0, 0.3);
+            --card-shadow-color-sm: rgba(0, 0, 0, 0.15);
+            --hero-bg-start: #2c2c2c;
+            --hero-bg-end: #1a1a1a;
+            --button-primary-bg: #42a5f5; /* Brighter blue for contrast */
+            --button-primary-hover-bg: #2196f3;
+            --link-hover: #42a5f5;
+            --chart-label-color: #e0e0e0;
+            --chart-grid-color: #444444;
+            --venn-bg: rgba(44, 44, 44, 0.7);
+            --venn-shadow-color: rgba(0, 0, 0, 0.2);
+            --input-border: #4b5563; /* gray-600 */
+            --input-focus-ring: #42a5f5; /* Dark mode blue */
+            --generated-output-bg: #374151; /* gray-700 */
+            --generated-output-border: #4b5563; /* gray-600 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .hero-background {
+            background: linear-gradient(135deg, var(--hero-bg-start) 0%, var(--hero-bg-end) 100%);
+            transition: background 0.3s ease;
+        }
+        .section-heading {
+            color: var(--button-primary-bg); /* Use primary button color for headings */
+        }
+        .chart-container {
+            background-color: var(--bg-secondary);
+            box-shadow: 0 4px 6px -1px var(--card-shadow-color), 0 2px 4px -1px var(--card-shadow-color-sm);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .button-primary {
+            background-color: var(--button-primary-bg);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .button-primary:hover {
+            background-color: var(--button-primary-hover-bg);
+        }
+        .venn-circle {
+            border: 3px solid;
+            background-color: var(--venn-bg);
+            box-shadow: 0 2px 4px var(--venn-shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .color-brick {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px var(--card-shadow-color), 0 4px 6px -2px var(--card-shadow-color-sm);
+        }
+        /* Header specific styles */
+        .header-nav-item {
+            @apply text-sm font-medium px-3 py-1 rounded-full transition-colors duration-200;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+        .header-nav-item:hover {
+            background-color: var(--border-color); /* Lighter gray for hover in light, slightly darker in dark */
+            color: var(--link-hover);
+        }
+        /* Input and Output styles */
+        input[type="text"] {
+            border-color: var(--input-border);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        input[type="text"]:focus {
+            border-color: var(--input-focus-ring);
+            box-shadow: 0 0 0 2px var(--input-focus-ring);
+        }
+        .output-box {
+            background-color: var(--generated-output-bg);
+            border-color: var(--generated-output-border);
+            color: var(--text-primary);
+        }
+        table thead {
+            background-color: var(--generated-output-bg);
+            border-color: var(--generated-output-border);
+        }
+        table th {
+            color: var(--text-primary);
+        }
+        table td {
+            color: var(--text-secondary);
+        }
+        table tr {
+            border-color: var(--generated-output-border);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 transition-colors duration-300" style="background-color: var(--bg-secondary);">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold" style="color: var(--text-primary);">A/B Insights<span class="text-[#1a73e8]">.ai</span></h1>
+            <nav class="flex items-center space-x-4">
+                <ul class="hidden md:flex space-x-2">
+                    <li><a href="#intro" class="header-nav-item">What is A/B Testing?</a></li>
+                    <li><a href="#framework" class="header-nav-item">Framework</a></li>
+                    <li><a href="#pm" class="header-nav-item">For Product Managers</a></li>
+                    <li><a href="#ai-pm" class="header-nav-item">For AI Product Managers</a></li>
+                    <li><a href="#stats" class="header-nav-item">Best Practices</a></li>
+                </ul>
+                <!-- Theme Toggle Button -->
+                <button id="themeToggle" class="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300" style="background-color: var(--generated-output-bg); color: var(--text-primary);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-background py-20 md:py-32 text-center">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6" style="color: var(--text-primary);">
+                Optimize with Confidence: <br class="hidden sm:inline">The Power of Data-Driven Experimentation
+            </h2>
+            <p class="text-lg md:text-xl max-w-4xl mx-auto mb-10" style="color: var(--text-secondary);">
+                Unlock deeper insights into user behavior and accelerate product growth with robust A/B testing methodologies tailored for modern product and AI teams.
+            </p>
+            <a href="#pm" class="button-primary inline-block text-lg">Start Your Experiment Journey</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Section 1: Introduction & Benefits -->
+        <section id="intro" class="mb-16 py-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold section-heading mb-4">What is A/B Testing?</h2>
+                <p class="max-w-3xl mx-auto text-lg" style="color: var(--text-secondary);">
+                    A/B testing is a rigorous, randomized experimentation process designed to compare two or more versions of a digital asset. By measuring user interactions, it allows for data-backed decisions, effectively eliminating guesswork from optimization efforts and establishing a causal link between a change and its outcome.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="p-6 rounded-xl shadow-md border-t-4 border-[#4285F4] text-center hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <div class="text-4xl mb-3">📊</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Data-Driven Decisions</h3>
+                    <p class="text-slate-600" style="color: var(--text-secondary);">Empowers teams to make choices based on empirical evidence, not intuition, reducing costly mistakes.</p>
+                </div>
+                <div class="p-6 rounded-xl shadow-md border-t-4 border-[#34A853] text-center hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <div class="text-4xl mb-3">📈</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Enhanced ROI</h3>
+                    <p class="text-slate-600" style="color: var(--text-secondary);">Optimizes conversion rates from existing traffic, directly improving return on investment.</p>
+                </div>
+                <div class="p-6 rounded-xl shadow-md border-t-4 border-[#FBBC05] text-center hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <div class="text-4xl mb-3">😊</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Improved User Experience</h3>
+                    <p class="text-slate-600" style="color: var(--text-secondary);">Identifies designs and features that truly resonate, increasing engagement and satisfaction.</p>
+                </div>
+                <div class="p-6 rounded-xl shadow-md border-t-4 border-[#EA4335] text-center hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <div class="text-4xl mb-3">🛡️</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Risk Mitigation</h3>
+                    <p class="text-slate-600" style="color: var(--text-secondary);">Allows for piloting changes with a small audience before a full-scale, confident rollout.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The A/B Testing Framework -->
+        <section id="framework" class="mb-16 py-8 rounded-xl shadow-lg p-6 md:p-10" style="background-color: var(--bg-secondary);">
+            <h2 class="text-3xl md:text-4xl font-bold section-heading text-center mb-12">The A/B Testing Framework: A 5-Step Process</h2>
+            <div class="relative flex flex-col lg:flex-row justify-between items-center space-y-8 lg:space-y-0 lg:space-x-4">
+                <div class="relative w-full lg:w-1/5 p-6 rounded-xl shadow-sm text-center flow-line border-b-2 border-[#4285F4]" style="background-color: var(--generated-output-bg);">
+                    <div class="text-3xl font-extrabold text-[#4285F4]">1</div>
+                    <h3 class="text-lg font-bold mt-2" style="color: var(--text-primary);">Define & Hypothesize</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Set clear, measurable goals and form a justified, predictive statement of the expected outcome.</p>
+                </div>
+                <div class="relative w-full lg:w-1/5 p-6 rounded-xl shadow-sm text-center flow-line border-b-2 border-[#34A853]" style="background-color: var(--generated-output-bg);">
+                    <div class="text-3xl font-extrabold text-[#34A853]">2</div>
+                    <h3 class="text-lg font-bold mt-2" style="color: var(--text-primary);">Design & Segment</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Create distinct variations and define user segments for randomized assignment.</p>
+                </div>
+                <div class="relative w-full lg:w-1/5 p-6 rounded-xl shadow-sm text-center flow-line border-b-2 border-[#FBBC05]" style="background-color: var(--generated-output-bg);">
+                    <div class="text-3xl font-extrabold text-[#FBBC05]">3</div>
+                    <h3 class="text-lg font-bold mt-2" style="color: var(--text-primary);">Execute & Monitor</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Run the test for a sufficient duration while monitoring key metrics and guardrails in real-time.</p>
+                </div>
+                <div class="relative w-full lg:w-1/5 p-6 rounded-xl shadow-sm text-center flow-line border-b-2 border-[#EA4335]" style="background-color: var(--generated-output-bg);">
+                    <div class="text-3xl font-extrabold text-[#EA4335]">4</div>
+                    <h3 class="text-lg font-bold mt-2" style="color: var(--text-primary);">Analyze Results</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Use statistical methods to determine if there is a significant winner, considering practical impact.</p>
+                </div>
+                <div class="relative w-full lg:w-1/5 p-6 rounded-xl shadow-sm text-center border-b-2 border-[#4285F4]" style="background-color: var(--generated-output-bg);">
+                    <div class="text-3xl font-extrabold text-[#4285F4]">5</div>
+                    <h3 class="text-lg font-bold mt-2" style="color: var(--text-primary);">Conclude & Iterate</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Implement winning changes, learn from failures, and use insights to inform the next cycle.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: For the Product Manager -->
+        <section id="pm" class="mb-16 py-8">
+            <h2 class="text-3xl md:text-4xl font-bold section-heading text-center mb-4">A Guide for the Product Manager</h2>
+            <p class="text-center text-lg max-w-3xl mx-auto mb-12" style="color: var(--text-secondary);">Focus on high-impact areas and be aware of common pitfalls to drive meaningful product improvements.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="p-6 rounded-xl shadow-md hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">What Elements Should You Test?</h3>
+                    <p class="text-center mb-4" style="color: var(--text-secondary);">Prioritize testing elements that directly influence user decisions and actions. The goal is to identify changes significant enough to produce a measurable effect.</p>
+                    <div class="chart-container">
+                        <canvas id="elementsToTestChart"></canvas>
+                    </div>
+                </div>
+                <div class="p-6 rounded-xl shadow-md hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">The Power of Specificity in CTAs</h3>
+                    <p class="text-center mb-4" style="color: var(--text-secondary);">Action-oriented Call-to-Actions (CTAs) that manage user expectations consistently outperform vague, generic phrases by reducing friction and providing clarity.</p>
+                    <div class="chart-container">
+                        <canvas id="ctaEffectivenessChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- New: Hypothesis Generator for PMs -->
+                <div class="lg:col-span-2 p-6 rounded-xl shadow-md" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">✨ A/B Test Hypothesis Generator ✨</h3>
+                    <p class="text-center max-w-2xl mx-auto mb-6" style="color: var(--text-secondary);">Describe your product goal (e.g., "increase user retention," "improve conversion rate on checkout page"), and get a structured A/B test hypothesis.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                        <input type="text" id="hypothesisInput" placeholder="e.g., improve mobile app sign-ups" class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2" style="border-color: var(--input-border); background-color: var(--bg-secondary); color: var(--text-primary); focus:ring-color: var(--input-focus-ring);">
+                        <button id="generateHypothesisBtn" class="button-primary">Generate Hypothesis</button>
+                    </div>
+                    <div id="hypothesisOutput" class="mt-6 p-4 rounded-lg border text-center output-box">
+                        <span class="text-slate-400">Your generated hypothesis will appear here...</span>
+                    </div>
+                     <div id="hypothesisLoader" class="hidden text-center mt-4" style="color: var(--text-secondary);">Loading...</div>
+                </div>
+
+            </div>
+        </section>
+        
+        <!-- Section 4: For the AI Product Manager -->
+        <section id="ai-pm" class="mb-16 py-8 rounded-xl shadow-lg p-6 md:p-10" style="background-color: var(--bg-secondary);">
+            <h2 class="text-3xl md:text-4xl font-bold section-heading text-center mb-4">Navigating the AI Frontier</h2>
+            <p class="text-center text-lg max-w-3xl mx-auto mb-12" style="color: var(--text-secondary);">Testing AI/ML features introduces new layers of complexity, requiring expanded metrics and robust safety guardrails.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="p-6 rounded-xl shadow-md hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">Traditional vs. AI Testing Metrics</h3>
+                     <p class="text-center mb-6" style="color: var(--text-secondary);">AI experiments require a broader set of metrics that encompass not just user behavior but also model performance, quality, and operational cost.</p>
+                    <div class="relative h-72 md:h-96 flex items-center justify-center">
+                        <div class="venn-circle w-48 h-48 md:w-64 md:h-64" style="border-color: #4285F4; background-color: rgba(66, 133, 244, 0.1); position: absolute; left: 20%; z-index: 1;"></div>
+                        <div class="venn-circle w-48 h-48 md:w-64 md:h-64" style="border-color: #FBBC05; background-color: rgba(251, 188, 5, 0.1); position: absolute; right: 20%; z-index: 1;"></div>
+                        
+                        <div class="absolute -left-4 md:left-2 top-1/4 transform -translate-y-1/2 text-sm md:text-base text-left w-40 md:w-48" style="color: var(--text-secondary);">
+                            <span class="color-brick bg-[#4285F4]"></span>
+                            <span class="font-bold" style="color: var(--text-primary);">Traditional Metrics:</span><br>
+                            Clicks, Conversions
+                        </div>
+                        <div class="absolute -right-4 md:right-2 top-1/4 transform -translate-y-1/2 text-sm md:text-base text-right w-40 md:w-48" style="color: var(--text-secondary);">
+                            <span class="color-brick bg-[#FBBC05]"></span>
+                            <span class="font-bold" style="color: var(--text-primary);">AI/ML Metrics:</span><br>
+                            Latency, Accuracy, Cost
+                        </div>
+                        <div class="absolute text-center font-semibold z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" style="color: var(--text-primary);">
+                            <span class="color-brick" style="background-image: linear-gradient(to right, rgba(66, 133, 244, 0.5), rgba(251, 188, 5, 0.5));"></span>
+                            <span class="text-base md:text-lg">Engagement Metrics</span><br>
+                            <span class="text-sm font-normal" style="color: var(--text-secondary);">(CTR, Session Time)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-xl shadow-md hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">Evaluating AI Feature Performance</h3>
+                    <p class="text-center mb-4" style="color: var(--text-secondary);">Comparing different AI models or prompts requires a multi-faceted evaluation across technical, quality, and user experience dimensions.</p>
+                    <div class="chart-container">
+                        <canvas id="aiPerformanceRadar"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 p-6 rounded-xl shadow-md" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">Implementing AI Guardrails</h3>
+                    <p class="text-center max-w-3xl mx-auto mb-6" style="color: var(--text-secondary);">Robust guardrails are non-negotiable for responsible AI deployment. They involve integrating business logic and deploying continuous monitoring to prevent model degradation, detect bias, and safeguard the user experience.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
+                        <div class="text-center p-4 rounded-lg bg-blue-50" style="background-color: var(--generated-output-bg);">
+                            <div class="text-3xl">⚖️</div>
+                            <div class="font-bold text-[#EA4335] mt-2">Bias & Fairness Monitoring</div>
+                        </div>
+                        <div class="text-4xl hidden md:block" style="color: var(--border-color);">→</div>
+                        <div class="text-center p-6 rounded-full text-white shadow-xl" style="background-color: var(--button-primary-bg);">
+                            <div class="text-4xl">🤖</div>
+                            <div class="font-bold mt-2">AI Model</div>
+                        </div>
+                        <div class="text-4xl hidden md:block" style="color: var(--border-color);">←</div>
+                        <div class="text-center p-4 rounded-lg bg-green-50" style="background-color: var(--generated-output-bg);">
+                            <div class="text-3xl">📉</div>
+                            <div class="font-bold text-[#34A853] mt-2">Model Drift Detection</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New: AI Metric Suggestor -->
+                <div class="lg:col-span-2 p-6 rounded-xl shadow-md" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">✨ AI Metric Suggester ✨</h3>
+                    <p class="text-center max-w-2xl mx-auto mb-6" style="color: var(--text-secondary);">Describe your AI-powered feature (e.g., "a personalized news feed," "a chatbot for customer support"), and get suggested metrics for A/B testing its performance.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                        <input type="text" id="aiFeatureInput" placeholder="e.g., a smart spam filter" class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2" style="border-color: var(--input-border); background-color: var(--bg-secondary); color: var(--text-primary); focus:ring-color: var(--input-focus-ring);">
+                        <button id="suggestAIMetricsBtn" class="button-primary">Suggest AI Metrics</button>
+                    </div>
+                    <div id="aiMetricsOutput" class="mt-6 p-4 rounded-lg border text-center output-box">
+                        <span class="text-slate-400">Suggested AI/ML metrics will appear here...</span>
+                    </div>
+                    <div id="aiMetricsLoader" class="hidden text-center mt-4" style="color: var(--text-secondary);">Loading...</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 5: Statistical Best Practices -->
+        <section id="stats" class="mb-16 py-8">
+            <h2 class="text-3xl md:text-4xl font-bold section-heading text-center mb-4">Statistical Best Practices</h2>
+             <p class="text-center text-lg max-w-3xl mx-auto mb-12" style="color: var(--text-secondary);">Adhering to statistical rigor is what separates reliable insights from random noise.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                 <div class="p-6 rounded-xl shadow-md hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">The Danger of "Peeking"</h3>
+                    <p class="text-center mb-4" style="color: var(--text-secondary);">Stopping a test prematurely when a variant seems to be winning leads to false positives. Statistical significance stabilizes only after collecting enough data over a sufficient duration.</p>
+                    <div class="chart-container">
+                        <canvas id="peekingDangerChart"></canvas>
+                    </div>
+                </div>
+                <div class="p-6 rounded-xl shadow-md hover-lift transition-all duration-300" style="background-color: var(--bg-secondary);">
+                    <h3 class="text-xl font-bold text-center mb-4" style="color: var(--text-primary);">Key Concepts at a Glance</h3>
+                    <p class="text-center mb-4" style="color: var(--text-secondary);">Understanding these core ideas is essential for interpreting test results correctly.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="border-b" style="background-color: var(--generated-output-bg); border-color: var(--generated-output-border);">
+                                <tr>
+                                    <th class="p-4 font-bold" style="color: var(--text-primary);">Concept</th>
+                                    <th class="p-4 font-bold" style="color: var(--text-primary);">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b" style="border-color: var(--generated-output-border);">
+                                    <td class="p-4 font-semibold" style="color: var(--text-primary);">Sample Size</td>
+                                    <td class="p-4" style="color: var(--text-secondary);">The number of users needed to reliably detect an effect. Must be determined before the test starts.</td>
+                                </tr>
+                                <tr class="border-b" style="border-color: var(--generated-output-border);">
+                                    <td class="p-4 font-semibold" style="color: var(--text-primary);">Statistical Significance</td>
+                                    <td class="p-4" style="color: var(--text-secondary);">The probability that the observed result is not due to random chance (typically >95%).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-semibold" style="color: var(--text-primary);">Confidence Interval</td>
+                                    <td class="p-4" style="color: var(--text-secondary);">A range of values within which the true effect of the change is likely to fall. Non-overlapping intervals indicate a winner.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-16 py-8 border-t" style="background-color: var(--hero-bg-start); border-color: var(--border-color);">
+        <div class="container mx-auto px-6 text-center" style="color: var(--text-secondary);">
+            <p>&copy; 2025 A/B Insights.ai. All rights reserved. Created by Kumar Siddharth Nirmal.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme preference or system preference
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        htmlElement.setAttribute('data-theme', currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            let newTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateChartColors(); // Update chart colors on theme change
+        });
+
+        // Function to update Chart.js colors based on theme
+        function updateChartColors() {
+            const isDarkMode = htmlElement.getAttribute('data-theme') === 'dark';
+            const chartLabelColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-label-color').trim();
+            const chartGridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color').trim();
+
+            // Loop through all existing charts and update their options
+            Chart.helpers.each(Chart.instances, function(chart) {
+                // Check if scales object and x/y scales exist before accessing properties
+                if (chart.options.scales) {
+                    if (chart.options.scales.x && chart.options.scales.x.ticks) {
+                        chart.options.scales.x.ticks.color = chartLabelColor;
+                    }
+                    if (chart.options.scales.y && chart.options.scales.y.ticks) {
+                        chart.options.scales.y.ticks.color = chartLabelColor;
+                    }
+                    if (chart.options.scales.x && chart.options.scales.x.grid) {
+                        chart.options.scales.x.grid.color = chartGridColor;
+                    }
+                    if (chart.options.scales.y && chart.options.scales.y.grid) {
+                        chart.options.scales.y.grid.color = chartGridColor;
+                    }
+                    if (chart.options.scales.r) { // For radar chart
+                        if (chart.options.scales.r.pointLabels) {
+                            chart.options.scales.r.pointLabels.color = chartLabelColor;
+                        }
+                        if (chart.options.scales.r.grid) {
+                            chart.options.scales.r.grid.color = chartGridColor;
+                        }
+                        if (chart.options.scales.r.angleLines) {
+                            chart.options.scales.r.angleLines.color = chartGridColor;
+                        }
+                        if (chart.options.scales.r.ticks) {
+                             chart.options.scales.r.ticks.color = chartLabelColor;
+                             chart.options.scales.r.ticks.backdropColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-secondary').trim();
+                        }
+                    }
+                }
+                if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                    chart.options.plugins.legend.labels.color = chartLabelColor;
+                }
+                chart.update();
+            });
+        }
+
+
+        // Tooltip configuration for Chart.js
+        const tooltipConfig = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Function to wrap long labels for Chart.js
+        const wrapLabel = (label) => {
+            const maxLength = 16;
+            if (label.length <= maxLength) return label;
+            
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            words.forEach(word => {
+                if ((currentLine + ' ' + word).trim().length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            });
+            lines.push(currentLine.trim());
+            return lines;
+        };
+
+        // Chart 1: Elements to Test (Donut)
+        const elementsToTestCtx = document.getElementById('elementsToTestChart').getContext('2d');
+        const elementsData = {
+            labels: ['Call-to-Action (CTA)', 'Headlines & Copy', 'Images & Visuals', 'Page Layout & Nav', 'Forms'],
+            datasets: [{
+                label: 'Elements to Test',
+                data: [35, 25, 20, 15, 5],
+                backgroundColor: [
+                    '#4285F4', // Google Blue
+                    '#34A853', // Google Green
+                    '#FBBC05', // Google Yellow
+                    '#EA4335', // Google Red
+                    '#757575'  // Darker Grey
+                ],
+                borderColor: 'var(--bg-secondary)',
+                borderWidth: 2
+            }]
+        };
+        new Chart(elementsToTestCtx, {
+            type: 'doughnut',
+            data: elementsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    ...tooltipConfig.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'var(--chart-label-color)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 2: CTA Effectiveness (Bar)
+        const ctaEffectivenessCtx = document.getElementById('ctaEffectivenessChart').getContext('2d');
+        const ctaData = {
+            labels: ['"Get My Free Trial"', '"Shop New Arrivals"', '"Download the Guide"', '"Learn More"', '"Submit"'],
+            datasets: [{
+                label: 'Relative Conversion Uplift (%)',
+                data: [25, 21, 18, 5, 2],
+                backgroundColor: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#757575'],
+                borderColor: 'var(--bg-secondary)',
+                borderWidth: 1
+            }]
+        };
+        new Chart(ctaEffectivenessCtx, {
+            type: 'bar',
+            data: ctaData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Conversion Uplift vs. Generic Baseline',
+                            color: 'var(--chart-label-color)'
+                        },
+                        ticks: {
+                            color: 'var(--chart-label-color)'
+                        },
+                        grid: {
+                            color: 'var(--chart-grid-color)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'var(--chart-label-color)'
+                        },
+                        grid: {
+                            color: 'var(--chart-grid-color)'
+                        }
+                    }
+                },
+                plugins: {
+                    ...tooltipConfig.plugins,
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Chart 3: AI Performance (Radar)
+        const aiPerformanceCtx = document.getElementById('aiPerformanceRadar').getContext('2d');
+        const aiPerformanceData = {
+            labels: ['Accuracy', 'Latency', 'User Satisfaction', 'Cost Efficiency', 'Feature Adoption', 'Robustness'],
+            datasets: [{
+                label: 'New Recommendation Model',
+                data: [85, 70, 75, 60, 80, 78],
+                fill: true,
+                backgroundColor: 'rgba(66, 133, 244, 0.2)', /* Google Blue transparent */
+                borderColor: '#4285F4',
+                pointBackgroundColor: '#4285F4',
+            }, {
+                label: 'Control (Current Model)',
+                data: [78, 85, 65, 90, 70, 88],
+                fill: true,
+                backgroundColor: 'rgba(251, 188, 5, 0.2)', /* Google Yellow transparent */
+                borderColor: '#FBBC05',
+                pointBackgroundColor: '#FBBC05',
+            }]
+        };
+        new Chart(aiPerformanceCtx, {
+            type: 'radar',
+            data: aiPerformanceData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                 plugins: {
+                    ...tooltipConfig.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'var(--chart-label-color)'
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true,
+                            color: 'var(--chart-grid-color)'
+                        },
+                        grid: {
+                            color: 'var(--chart-grid-color)'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        ticks: {
+                            color: 'var(--chart-label-color)',
+                            backdropColor: 'var(--bg-secondary)'
+                        },
+                        pointLabels: {
+                            color: 'var(--chart-label-color)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 4: Peeking Danger (Line)
+        const peekingDangerCtx = document.getElementById('peekingDangerChart').getContext('2d');
+        const peekingData = {
+            labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10', 'Day 11', 'Day 12', 'Day 13', 'Day 14'],
+            datasets: [{
+                label: 'Variant B Uplift % (Unstable)',
+                data: [15, -5, 25, 8, 18, -2, 12, 6, 9, 7, 8, 8.5, 8.2, 8.3],
+                borderColor: '#EA4335', /* Google Red */
+                tension: 0.4,
+                fill: false
+            }, {
+                label: 'Significance Threshold (95%)',
+                data: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+                borderColor: '#34A853', /* Google Green */
+                borderDash: [5, 5],
+                pointRadius: 0
+            }]
+        };
+         new Chart(peekingDangerCtx, {
+            type: 'line',
+            data: peekingData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Observed Conversion Uplift (%)',
+                            color: 'var(--chart-label-color)'
+                        },
+                        ticks: {
+                            color: 'var(--chart-label-color)'
+                        },
+                        grid: {
+                            color: 'var(--chart-grid-color)'
+                        }
+                    },
+                     x: {
+                        ticks: {
+                            color: 'var(--chart-label-color)'
+                        },
+                        grid: {
+                            color: 'var(--chart-grid-color)'
+                        }
+                    }
+                },
+                 plugins: {
+                    ...tooltipConfig.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'var(--chart-label-color)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Initial chart color update on page load
+        window.onload = updateChartColors;
+
+
+        // Gemini API integration for Hypothesis Generator
+        document.getElementById('generateHypothesisBtn').addEventListener('click', async () => {
+            const input = document.getElementById('hypothesisInput').value;
+            const outputDiv = document.getElementById('hypothesisOutput');
+            const loader = document.getElementById('hypothesisLoader');
+
+            if (!input.trim()) {
+                outputDiv.innerHTML = '<span class="text-red-500">Please enter a product goal.</span>';
+                return;
+            }
+
+            outputDiv.innerHTML = '';
+            loader.classList.remove('hidden');
+
+            try {
+                const prompt = `Generate a clear and measurable A/B test hypothesis based on the following product goal: "${input}". The hypothesis should follow the structure: "If [we make this change], then [this outcome] will happen, because [this reason]."`;
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    outputDiv.textContent = text;
+                } else {
+                    outputDiv.innerHTML = '<span class="text-red-500">Failed to generate hypothesis. Please try again.</span>';
+                }
+            } catch (error) {
+                console.error('Error generating hypothesis:', error);
+                outputDiv.innerHTML = '<span class="text-red-500">An error occurred. Please try again.</span>';
+            } finally {
+                loader.classList.add('hidden');
+            }
+        });
+
+        // Gemini API integration for AI Metric Suggestor
+        document.getElementById('suggestAIMetricsBtn').addEventListener('click', async () => {
+            const input = document.getElementById('aiFeatureInput').value;
+            const outputDiv = document.getElementById('aiMetricsOutput');
+            const loader = document.getElementById('aiMetricsLoader');
+
+            if (!input.trim()) {
+                outputDiv.innerHTML = '<span class="text-red-500">Please describe your AI feature.</span>';
+                return;
+            }
+
+            outputDiv.innerHTML = '';
+            loader.classList.remove('hidden');
+
+            try {
+                const prompt = `Given the AI-powered feature: "${input}", suggest key performance metrics suitable for A/B testing its effectiveness. Focus on metrics relevant to AI/ML systems, including user experience, model performance, and operational considerations. Provide them as a bulleted list.`;
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    outputDiv.innerHTML = text.replace(/\n/g, '<br>'); // Render newlines as breaks
+                } else {
+                    outputDiv.innerHTML = '<span class="text-red-500">Failed to suggest metrics. Please try again.</span>';
+                }
+            } catch (error) {
+                console.error('Error suggesting AI metrics:', error);
+                outputDiv.innerHTML = '<span class="text-red-500">An error occurred. Please try again.</span>';
+            } finally {
+                loader.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
