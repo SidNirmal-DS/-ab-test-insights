@@ -1,4 +1,4 @@
-# 🎯 A/B Insights.ai — Your Data-Driven Product Optimization Hub
+# 🎯 A/B Insights.ai — Data-Driven Product Optimization Hub
 
 **A clean, modern, and AI-powered website designed to empower Product Managers and AI Product Managers with practical, actionable A/B testing strategies.**
 
